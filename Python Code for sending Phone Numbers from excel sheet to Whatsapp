@@ -1,0 +1,55 @@
+import openpyxl
+import pywhatkit
+from datetime import datetime
+def open_excel_workbook(file_path):
+    try:
+        workbook = openpyxl.load_workbook(file_path)
+        return workbook
+    except Exception as e:
+        print("Error occurred while opening the file: {e}")
+        exit()
+
+
+name=r'C:\Users\tejas\Downloads\SSLC 2018-19 NEAR HULIMAVU.xlsx'
+wb = open_excel_workbook(name)
+
+if isinstance(wb, openpyxl.workbook.workbook.Workbook):
+    print(f"Successfully opened workbook: {name}")
+else:
+    print(wb)
+
+print("enter column letter of the column you want to send via whatsapp")
+col=input()
+
+
+def get_column_data(file_path, column_letter):
+    workbook = openpyxl.load_workbook(file_path)
+    sheet = workbook.active
+
+    column_data = []
+    for row in sheet.iter_rows(min_col=openpyxl.utils.column_index_from_string(column_letter),
+                               max_col=openpyxl.utils.column_index_from_string(column_letter),
+                               min_row=2, values_only=True):
+        column_data.append(row[0])
+
+    return column_data
+
+
+data = get_column_data(name,col)
+print("enter number to send the data")
+number=input()
+
+prefix="+91"
+
+if (str(number).isdigit() and len(str(number))==10):
+    no=prefix+number
+    now = datetime.now()
+    hours = now.hour
+
+    minutes = now.minute + 1
+    pywhatkit.sendwhatmsg(no, 'Below is a list of numbers', hours, minutes + 1)
+    for i in range(len(data)):
+
+        pywhatkit.sendwhatmsg(str(no),str(data[i]),hours,minutes+2*(i+1))
+else:
+    print("incorrect number")
